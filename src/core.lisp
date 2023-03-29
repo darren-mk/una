@@ -74,27 +74,12 @@
                 (hunchentoot:raw-post-data))))
      ,code))
 
-(comment
-  :macro
-  '(macroexpand '(w-resp-body (print "hi!")))
-  :result
-  '(let ((body (unsigned-bytes->alist (hct:raw-post-data))))
-    (print "hi!")))
-
 (f-> responsify (http-result string cons) *)
 (defun responsify (result msg data)
   (jsn:encode-json-alist-to-string
    (list (cons :result result)
          (cons :msg msg)
          (cons :data data))))
-
-(comment
-  '(responsify :success "good job!" (list (cons "age" 100)))
-  "{\"result\":\"success!\",\"msg\":\"good job!\",\"data\":{\"age\":100}}"
-  (responsify :good "good job!" (list (cons "age" 100)))
-  "compilation fails"
-  (responsify "success" "good job!" (list (cons "age" 100)))
-  "compilation fails")
 
 #| middleware |#
 

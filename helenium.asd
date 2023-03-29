@@ -12,9 +12,9 @@
                :babel
                :cl-json
                :easy-routes
+               :fiveam
                :hunchentoot
                :ironclad
-               :jonathan
                :jose
                :serapeum
                :uuid))
