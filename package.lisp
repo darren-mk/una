@@ -1,7 +1,6 @@
 (defpackage #:helenium
-  (:use #:cl)
+  (:use #:cl #:serapeum #:alexandria)
   (:local-nicknames
-   (:alx :alexandria)
    (:arm :arrow-macros)
    (:bbl :babel)
    (:esr :easy-routes)
@@ -10,5 +9,4 @@
    (:hct :hunchentoot)
    (:irc :ironclad)
    (:jos :jose)
-   (:srp :serapeum)
    (:uid :uuid)))

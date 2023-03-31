@@ -1,49 +1,37 @@
 (in-package #:helenium)
 
-#| global declaration |#
+#| env |#
 
 (declaim (optimize safety))
 
 (setf *print-case* :downcase)
 
+(toggle-pretty-print-hash-table t)
+
+#| global |#
+
 (defparameter *key*
   (irc:ascii-string-to-byte-array "my-temp-secret"))
 
-(defvar port-no 3000)
+(defvar port-no
+  3000)
 
-(defparameter *tdb* (list))
+(defparameter *tdb*
+  (list))
 
 #| type |#
 
-(deftype http-result () '(member :success :fail))
-
-
-#| util |#
-
-(defun comment (&rest codes)
-  codes)
-
-(defmacro f-> (fname args ret)
-  `(declaim (ftype (function ,args ,ret) ,fname)))
-
-(comment
-  "check macro"
-  '(macroexpand '(f-> pass-int (integer) integer))
-  '(eval-when (:compile-toplevel :load-toplevel :execute)
-    (sb-c::%proclaim '(ftype (function (integer) integer) pass-int)
-     (sb-c:source-location)))
-  "check usasge"
-  '(f-> pass-int (integer) integer)
-  '(defun pass-int (x) x))
+(deftype http-result ()
+  '(member :success :fail))
 
 #| domain |#
 
 (defclass consumer ()
   ((id :initarg :id :type small-number-array :accessor id-of)
    (fname :initarg :fname :type string :accessor fname-of)
-   (lname :initarg :lname :type string  :accessor lname-of)
-   (email :initform "AAA" :type string  :accessor email-of)
-   (pcode :initarg :pcode :type string  :accessor password-of)))
+   (lname :initarg :lname :type string :accessor lname-of)
+   (email :initform "AAA" :type string :accessor email-of)
+   (pcode :initarg :pcode :type string :accessor password-of)))
 
 (defmethod alistify ((consumer consumer))
   (let ((id (id-of consumer))
@@ -74,7 +62,7 @@
                 (hunchentoot:raw-post-data))))
      ,code))
 
-(f-> responsify (http-result string cons) *)
+(-> responsify (http-result string cons) *)
 (defun responsify (result msg data)
   (jsn:encode-json-alist-to-string
    (list (cons :result result)
