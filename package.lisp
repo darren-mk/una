@@ -1,7 +1,8 @@
 (defpackage #:helenium
-  (:use #:cl #:serapeum #:alexandria)
+  (:export #:start #:stop #:refresh)
+  (:use :cl :alexandria :serapeum)
   (:local-nicknames
-   (:arm :arrow-macros)
+   (:am :arrow-macros)
    (:bbl :babel)
    (:esr :easy-routes)
    (:fvm :fiveam)

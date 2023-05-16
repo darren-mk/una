@@ -89,8 +89,8 @@
 (esr:defroute api-consumer-login
     ("/api/consumer/login" :method :post :decorators (@json)) ()
   (w-resp-body
-   (let* ((email (arm:->> body (assoc :email) cdr))
-          (password (arm:->> body (assoc :password) cdr)))
+   (let* ((email (am:->> body (assoc :email) cdr))
+          (password (am:->> body (assoc :password) cdr)))
      (if (and (string= email "jacksparrow@pirate.com")
               (string= password "abc123!@#"))
          (responsify :success "matched" (list (cons :token (tokenize email))))
