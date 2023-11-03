@@ -1,7 +1,7 @@
-(in-package #:helenium)
+(in-package #:una)
 
 (fvm:def-suite core-test
-  :description "testing helenium core")
+  :description "testing una core")
 
 (fvm:in-suite core-test)
 

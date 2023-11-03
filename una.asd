@@ -1,5 +1,5 @@
-(asdf:defsystem #:helenium
-  :description "backend for etafeed"
+(asdf:defsystem #:una
+  :description "backend"
   :author "darren.minsoo.kim@gmail.com"
   :license "All rights reserved."
   :version "0.0.1"
