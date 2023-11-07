@@ -16,22 +16,46 @@
 (defvar port-no
   3000)
 
-(defparameter *tdb*
-  (list))
-
 #| type |#
 
 (deftype http-result ()
   '(member :success :fail))
 
+#| database |#
+
+(defun connect-db ()
+  (pmd:connect-toplevel
+   "unadb" "darren" "" "localhost"))
+
+(defun disconnect-db ()
+  (pmd:disconnect-toplevel))
+
+(defun ensure-db-extension ()
+  (pmd:query "create extension if not exists \"uuid-ossp\";"))
+
+(defun get-uuid ()
+  "todo: this should be replaced by cl native function."
+  (am:->> "select uuid_generate_v4()"
+    pmd:query car car))
+
 #| domain |#
 
-(defclass consumer ()
-  ((id :initarg :id :type small-number-array :accessor id-of)
-   (fname :initarg :fname :type string :accessor fname-of)
-   (lname :initarg :lname :type string :accessor lname-of)
-   (email :initform "AAA" :type string :accessor email-of)
-   (pcode :initarg :pcode :type string :accessor password-of)))
+(defclass writer ()
+  ((id :col-type string
+       :initarg :id
+       :reader writer-id)
+   (first-name :col-type string
+               :initarg :first-name
+               :reader writer-first-name))
+  (:metaclass pmd:dao-class)
+  (:keys id))
+
+(srp:comment
+  (let ((darren (make-instance 'writer
+                             :id "b7ac6b9e-9584-4005-b5ca-a14a4d0ad55d"
+                             :first-name "Darren")))
+  (pmd:insert-dao darren))
+  (pmd:query (:select '* :from 'writer :where (:= 'first-name "Darren"))))
 
 (defmethod alistify ((consumer consumer))
   (let ((id (id-of consumer))

@@ -8,6 +8,8 @@
    (:fvm :fiveam)
    (:jsn :cl-json)
    (:hct :hunchentoot)
+   (:pmd :postmodern)
    (:irc :ironclad)
    (:jos :jose)
+   (:srp :serapeum)
    (:uid :uuid)))

@@ -16,5 +16,6 @@
                :hunchentoot
                :ironclad
                :jose
+               :postmodern
                :serapeum
                :uuid))
