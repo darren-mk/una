@@ -21,6 +21,14 @@
 (deftype http-result ()
   '(member :success :fail))
 
+#| util |#
+
+(defun now ()
+  (get-universal-time))
+
+(defun agetv (al k)
+  (am:->> al (assoc k) cdr))
+
 #| database |#
 
 (defun connect-db ()
@@ -30,9 +38,6 @@
 (defun disconnect-db ()
   (pmd:disconnect-toplevel))
 
-(defun ensure-db-extension ()
-  (pmd:query "create extension if not exists \"uuid-ossp\";"))
-
 (defun get-uuid ()
   "todo: this should be replaced by cl native function."
   (am:->> "select uuid_generate_v4()"
@@ -40,27 +45,36 @@
 
 #| domain |#
 
-(defclass writer ()
+(defclass common ()
   ((id :col-type string
        :initarg :id
-       :reader writer-id)
-   (first-name :col-type string
+       :reader id))
+  (:metaclass pmd:dao-class))
+
+(defclass writer (common)
+  ((first-name :col-type string
+               :type string
                :initarg :first-name
-               :reader writer-first-name))
+               :initform (error "first-name not supplied")
+               :reader first-name))
   (:metaclass pmd:dao-class)
   (:keys id))
 
 (srp:comment
-  (let ((darren (make-instance 'writer
-                             :id "b7ac6b9e-9584-4005-b5ca-a14a4d0ad55d"
-                             :first-name "Darren")))
-  (pmd:insert-dao darren))
-  (pmd:query (:select '* :from 'writer :where (:= 'first-name "Darren"))))
+  (let ((w (make-instance 'writer
+                          :first-name 12)))
+  (pmd:insert-dao w))
 
-(defmethod alistify ((consumer consumer))
+  (pmd:query
+   (:select '*
+    :from 'writer
+    :where (:= 'first-name "Oren"))
+   :alist)
+
+  (defmethod alistify ((consumer consumer))
   (let ((id (id-of consumer))
         (fname (fname-of consumer)))
-    `((:id . ,id) (:fname . ,fname))))
+    `((:id . ,id) (:fname . ,fname)))))
 
 (defvar unauthorized-msg
   (list (cons :result :unauthorized)))
@@ -84,6 +98,7 @@
 (defmacro w-resp-body (code)
   `(let ((body (unsigned-bytes->alist
                 (hunchentoot:raw-post-data))))
+     (print body)
      ,code))
 
 (-> responsify (http-result string cons) *)
@@ -110,8 +125,21 @@
 
 #| route |#
 
-(esr:defroute api-consumer-login
-    ("/api/consumer/login" :method :post :decorators (@json)) ()
+(esr:defroute
+    echo ("/api/echo" :method :get) (word)
+  word)
+
+(esr:defroute
+    post-writer ("/api/writer" :method :post) ()
+  (w-resp-body
+   (let* ((first-name (agetv body :first-name))
+          (w (make-instance 'writer :first-name first-name)))
+     (pmd:insert-dao w)
+     (responsify :success "posted" (list (cons :data "good"))))))
+
+(esr:defroute
+    api-consumer-login
+    ("/api/consumer/login" :method :post) ()
   (w-resp-body
    (let* ((email (am:->> body (assoc :email) cdr))
           (password (am:->> body (assoc :password) cdr)))
@@ -123,17 +151,23 @@
 #| control |#
 
 (defvar app
-  (make-instance 'easy-routes:routes-acceptor :port port-no))
+  (make-instance
+   'easy-routes:routes-acceptor
+   :port port-no))
 
 (defun start ()
-  (print "server started.")
-  (hct:start app))
+  (connect-db)
+  (print "# db connected.")
+  (hct:start app)
+  (print "# server started."))
 
 (defun stop ()
-  (print "server stopped.")
-  (hct:stop app))
+  (disconnect-db)
+  (print "# db disconnected.")
+  (hct:stop app)
+  (print "# server stopped."))
 
 (defun refresh ()
-  (print "server resetting.")
+  (print "# server restarted.")
   (hct:stop app)
   (hct:start app))
